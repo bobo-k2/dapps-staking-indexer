@@ -1,0 +1,70 @@
+specVersion: 1.0.0
+name: dapps-staking-indexer
+version: 0.0.4
+runner:
+  node:
+    name: '@subql/node'
+    version: '*'
+  query:
+    name: '@subql/query'
+    version: '*'
+description: Astar dApp staking indexer
+repository: 'https://github.com/subquery/astar-subql-starters'
+schema:
+  file: ./schema.graphql
+network:
+  chainId: '0x9eb76c5184c4ab8679d2d5d819fdf90b9c001403e9e17da2e14b6d8aec4029c6'
+  endpoint: 'wss://rpc.astar.network'
+  dictionary: 'https://api.subquery.network/sq/subquery/astar-dictionary'
+  chaintypes:
+    file: ./dist/chaintypes.js
+# network:
+#   chainId: '0xb5ddcd95c946041b318b6839b80e65700006b7f9fcddd1040fe1840ecd7e83d9'
+#   endpoint: 'ws://host.docker.internal:9944'
+#   # endpoint: 'ws://localhost:9944'
+#   chaintypes:
+#     file: ./dist/chaintypes.js
+dataSources:
+  - kind: substrate/Runtime
+    startBlock: 814289 #The first block after all Staking festival dapps were unregistered
+    #startBlock: 1
+    mapping:
+      file: ./dist/index.js
+      handlers:
+        # - handler: handleBlock
+        #   kind: substrate/BlockHandler
+        - handler: handleNewContract
+          kind: substrate/EventHandler
+          filter:
+            module: dappsStaking
+            method: NewContract
+        - handler: handleContractRemoved
+          kind: substrate/EventHandler
+          filter:
+            module: dappsStaking
+            method: ContractRemoved
+        - handler: handleBondAndStake
+          kind: substrate/EventHandler
+          filter:
+            module: dappsStaking
+            method: BondAndStake
+        - handler: handleUnbondAndUnstake
+          kind: substrate/EventHandler
+          filter:
+            module: dappsStaking
+            method: UnbondAndUnstake
+        - handler: handleReward
+          kind: substrate/EventHandler
+          filter:
+            module: dappsStaking
+            method: Reward
+        - handler: handleNominationTransfer
+          kind: substrate/EventHandler
+          filter:
+            module: dappsStaking
+            method: NominationTransfer
+        # - handler: handleRegisterCall
+        #   kind: substrate/CallHandler
+          # filter:
+          #   module: dappsStaking
+          #   method: register

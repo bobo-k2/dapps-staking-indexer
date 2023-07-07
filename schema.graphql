@@ -1,0 +1,47 @@
+enum ContractState {
+  Registered,
+  Unregistered
+}
+
+type Contract @entity {
+  id: ID! #id is a required field
+  owner: String!
+  state: ContractState!
+  blockRegistered: BigInt!
+  blockUnregistered: BigInt
+}
+
+type Stake @entity {
+  id: ID!
+  staker: String! @index
+  contract: String! @index
+  amount: BigInt!
+  block: BigInt
+  timestamp: BigInt!
+}
+
+type Reward @entity {
+  id: ID!
+  staker: String! @index
+  contract: String! @index
+  amount: BigInt!
+  block: BigInt!
+  era: Int!
+  timestamp: BigInt!
+}
+
+type Call @entity {
+  id: ID!
+  method: String!
+  success: Boolean!
+  block: BigInt!
+  timestamp: BigInt!
+}
+
+type EraReward @entity {
+  id: ID!
+  era: BigInt! @index
+  timestamp: BigInt!
+  stakerReward: BigInt!
+  dappReward: BigInt!
+}
