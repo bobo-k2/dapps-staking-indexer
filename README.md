@@ -44,14 +44,6 @@ In the starter package, we have provided a simple example of project configurati
 For more information on how to write the SubQuery, 
 check out our doc section on [Define the SubQuery](https://doc.subquery.network/define_a_subquery.html) 
 
-#### Code generation
-
-In order to index your SubQuery project, it is mandatory to build your project first.
-Run this command under the project directory.
-
-````
-yarn codegen
-````
 
 ## Build the project
 
