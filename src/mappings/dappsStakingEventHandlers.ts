@@ -5,7 +5,8 @@ import {Balance} from '@polkadot/types/interfaces';
 import crypto from 'crypto';
 
 function getAddress(address: Codec): string {
-    return JSON.parse(address.toString()).evm;
+    const addressObject = JSON.parse(address.toString());
+    return addressObject.evm ?? addressObject.wasm ;
 }
 
 async function handleStake(account: string, contractAddress: string, amount: bigint, event: SubstrateEvent): Promise<void> {
