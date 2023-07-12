@@ -62,7 +62,6 @@ export async function handleReward(event: SubstrateEvent): Promise<void> {
     const id = crypto.randomUUID();
     const record = new Reward(id);
     const amount = (balance as Balance).toBigInt();
-    // logger.warn(`Reward ${contract} ${account} ${amount}`);
 
     record.amount = amount;
     record.block = blockNumber;

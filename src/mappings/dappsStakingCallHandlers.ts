@@ -1,3 +1,5 @@
+// Still WIP. Trying to distinguish between staker and developer rewards 
+
 import { SubstrateEvent, SubstrateExtrinsic } from "@subql/types";
 import { Balance } from "@polkadot/types/interfaces";
 import { Call, EraReward } from "../types/models";
