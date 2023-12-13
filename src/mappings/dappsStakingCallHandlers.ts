@@ -1,4 +1,4 @@
-// Still WIP. Trying to distinguish between staker and developer rewards 
+// Still WIP. Trying to distinguish between staker and developer rewards
 
 import { SubstrateEvent, SubstrateExtrinsic } from "@subql/types";
 import { Balance } from "@polkadot/types/interfaces";
@@ -18,7 +18,10 @@ function isBatchCall(call: CallBase<AnyTuple>): boolean {
  * @param events Call events
  */
 function isBatchFailed(events: SubstrateEvent[]): number | null {
-  const index = events.findIndex(x => x.event.section === 'utility' && x.event.method === 'BatchInterrupted');
+  const index = events.findIndex(
+    (x) =>
+      x.event.section === "utility" && x.event.method === "BatchInterrupted"
+  );
 
   return index >= 0 ? index : null;
 }
@@ -50,7 +53,13 @@ async function getEraReward(era: bigint): Promise<EraReward> {
   let eraReward = await EraReward.get(era.toString());
 
   if (!eraReward) {
-    eraReward = new EraReward(era.toString());
+    eraReward = new EraReward(
+      era.toString(),
+      era,
+      BigInt(0),
+      BigInt(0),
+      BigInt(0)
+    );
     eraReward.era = era;
     eraReward.stakerReward = BigInt(0);
     eraReward.dappReward = BigInt(0);
@@ -74,7 +83,7 @@ async function aggreggateRewardsPerEra(
 
   // process calls
   if (isBatchCall(call)) {
-    const failedIndex = isBatchFailed(<SubstrateEvent[]>extrinsic.events)
+    const failedIndex = isBatchFailed(<SubstrateEvent[]>extrinsic.events);
     getCallsFromBatch(extrinsic.extrinsic.method).map(async (call) => {
       if (!failedIndex && isRewardCall(call)) {
         rewardCalls.push(call);
@@ -136,29 +145,37 @@ export async function handleRegisterCall(
   const module = extrinsic.extrinsic.method.section;
   const method = extrinsic.extrinsic.method.method;
 
-  logger.warn(`New call ${module}.${method}, idx ${extrinsic.idx}, success: ${extrinsic.success}`);
+  logger.warn(
+    `New call ${module}.${method}, idx ${extrinsic.idx}, success: ${extrinsic.success}`
+  );
   await aggreggateRewardsPerEra(extrinsic);
   return;
 
   if (isBatchCall(extrinsic.extrinsic.method)) {
     const promises = getCallsFromBatch(extrinsic.extrinsic.method).map(
       async (call) => {
-        const record = new Call(crypto.randomUUID());
-        record.block = extrinsic.block.block.header.number.toBigInt();
-        record.method = call.method;
-        record.success = extrinsic.success;
-        record.timestamp = BigInt(extrinsic.block.timestamp.getTime());
+        const record = new Call(
+          crypto.randomUUID(),
+          call.method,
+          extrinsic.success,
+          extrinsic.block.block.header.number.toBigInt(),
+          BigInt(extrinsic.block.timestamp.getTime())
+        );
+
         await record.save();
       }
     );
 
     await Promise.all(promises);
   } else if (module === "dappsStaking") {
-    const record = new Call(crypto.randomUUID());
-    record.block = extrinsic.block.block.header.number.toBigInt();
-    record.method = method;
-    record.success = extrinsic.success;
-    record.timestamp = BigInt(extrinsic.block.timestamp.getTime());
+    const record = new Call(
+      crypto.randomUUID(),
+      method,
+      extrinsic.success,
+      extrinsic.block.block.header.number.toBigInt(),
+      BigInt(extrinsic.block.timestamp.getTime())
+    );
+    
     await record.save();
   }
 }

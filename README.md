@@ -38,6 +38,7 @@ yarn install
 ## Build the project
 
 ```
+yarn codegen
 yarn build
 ```
 
